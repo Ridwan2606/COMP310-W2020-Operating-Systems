@@ -2,24 +2,34 @@
 #include<string.h>
 #include<stdlib.h>
 #include "shellmemory.h"
+#include "shell.h"
 
 /*
-This functions takes a variable name and value.
-It assigns the value argument to the environment variable varName in the shell memory array.
+This function takes an array of string. 
+First string is the "set" command
+Second string is a variable name
+Third string is a value
+It assigns that value to a environment variable with that variable name in the shell memory array.
 Return ERRORCODE -1 if out of memory else 0
 */
-int set(char * varName, char* value ){
+int set(char * words[]){
+    char* varName = words[1];
+    char* value = words[2];
     int errorCode = setVariable(varName,value);
     return errorCode;
 }
 
 /*
-This function takes a variable name as argument.
+This function takes an array of string. 
+First string is the "print command".
+Second string is the variable name.
 It will print the value associated with that variable if it exists.
 Else it will print an appropriate message.
 Return 0 if successful.
 */
-int print(char* varName){
+int print(char * words[]){
+
+    char* varName = words[1];
     char* value = getValue(varName);
 
     if (strcmp(value,"NONE")==0) {
@@ -30,6 +40,47 @@ int print(char* varName){
         printf("%s\n",value);
     }
     return 0;
+}
+
+/*
+This function takes an array of string.
+First string is the "run" command
+Second string is script filename to execute
+Returns:
+ERRORCODE -1 : RAN OUT OF SHELL MEMORY
+ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
+ERRORCODE -3 : FILE DOES NOT EXIST
+ERRORCODE -4 : UNKNOWN COMMAND. TYPE "help" FOR A MANUAL OF EVERY AVAILABLE COMMANDS
+*/
+int run(char * words[]){
+
+    char * filename = words[1];
+    FILE * fp = fopen(filename,"r");
+    int errorCode = 0;
+
+    // if file cannot be opened, return ERRORCODE -3
+    if (fp==NULL) return -3;
+
+    char buffer[1000];
+    fgets(buffer,999,fp);
+    while (!feof(fp)){
+        errorCode = parse(buffer);
+        // User input the "quit" command. Terminate execution of this script file.
+        if (errorCode == 1) {
+            // Run command successfully executed so ERRORCODE 0. Stop reading file.
+            printf("Terminating execution of %s....",filename);
+            errorCode = 0;
+            break;
+        } else if (errorCode != 0) {
+            // An error occurred. Display it and stop reading the file.
+            displayCode(errorCode);
+            break;
+        }
+        fgets(buffer,999,fp);
+    }
+    fclose(fp);
+    return errorCode;
+
 }
 
 int interpreter(char* words[]){
@@ -52,7 +103,6 @@ int interpreter(char* words[]){
         // if it's the "quit" command
         //errorCode is 1 when user voluntarily wants to quit the program.
         errorCode = 1;
-        printf("Bye!\n");
 
     } else if ( strcmp(words[0],"set") == 0 ) {
         // if it's the "set VAR STRING" command
@@ -62,7 +112,7 @@ int interpreter(char* words[]){
             return -2;
         } else {
             // ERRORCODE -1 : Out of Memory might occur
-            errorCode = set(words[1],words[2]);
+            errorCode = set(words);
         }
     }  else if ( strcmp(words[0],"print") == 0 ) {
         // if it's the "print VAR" command
@@ -70,18 +120,29 @@ int interpreter(char* words[]){
         if ( strcmp(words[1],"_NONE_") == 0 ) return -2;
 
         // Call the print function
-        errorCode = print(words[1]);
+        errorCode = print(words);
 
     } else if ( strcmp(words[0],"run") == 0 ) {
-        /////////////////
-        // TO COMPLETE //
-        /////////////////
+        // if it's the "run SCRIPT.TXT" command
+        // check if there's a second argument, return ERRORCODE -2 for invalid number of arguments
+        if ( strcmp(words[1],"_NONE_") == 0 ) return -2;
+
+        errorCode = run (words);
+
     }
 }
 
 int main() {
-    char* words[3] = {"quit","X","10"};
-    interpreter(words);
+    char* words1[3] = {"set","X","10"};
+    interpreter(words1);
+    /*
+    char* words2[3] = {"set","Y","30"};
+    interpreter(words2);
+    char* words3[3] = {"set","Z","20"};
+    interpreter(words3);
+    */
+    char* words4[3] = {"print","X"};
+    interpreter(words4);
 }
 /*
 COMMAND DESCRIPTION
@@ -117,3 +178,4 @@ end, the file is closed, and the command line prompt is displayed. If an error o
 executing the script due a command syntax error, then the error is displayed and the script
 stops executing.
 */
+

@@ -75,8 +75,8 @@ char* getValue (char *var){
     return environmentVars[position].value;
 }
 
+/*
 int main() {
-    /*
     setVariable("x","10");
     setVariable("y","20");
     setVariable("z","30");
@@ -87,8 +87,9 @@ int main() {
     {
         printf("%d : %s=%s\n",i,environmentVars[i].var,environmentVars[i].value);
     }
-    */
+    
     
 }
+*/
 
 
