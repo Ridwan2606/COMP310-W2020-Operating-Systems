@@ -71,7 +71,7 @@ If not found, it return "NONE"
 */
 char* getValue (char *var){
     int position = findVariable(var);
-    if (position=-1) return "NONE";
+    if (position==-1) return "NONE";
     return environmentVars[position].value;
 }
 
@@ -82,14 +82,16 @@ int main() {
     setVariable("z","30");
     setVariable("x","30");
     setVariable("l","30");
-    printf("%d\n", findVariable("x"));
+    printf("%d\n", findVariable("y"));
     for (int i = 0; i < memorySize; i++)
     {
         printf("%d : %s=%s\n",i,environmentVars[i].var,environmentVars[i].value);
     }
+    printf("%s\n",getValue("x"));
     
     
 }
 */
+
 
 

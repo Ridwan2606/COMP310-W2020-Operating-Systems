@@ -108,10 +108,11 @@ int interpreter(char* words[]){
         // if it's the "set VAR STRING" command
         // check for the presence or 2 more arguments
         // If one argument missing, return ERRORCODE -2 for invalid number of arguments
-        if ( ( strcmp(words[1],"_NONE_") == 0 ) || ( strcmp(words[1],"_NONE_") == 0 ) ) {
+        if ( ( strcmp(words[1],"_NONE_") == 0 ) || ( strcmp(words[2],"_NONE_") == 0 ) ) {
             return -2;
         } else {
             // ERRORCODE -1 : Out of Memory might occur
+            printf("SET REACHED \n");
             errorCode = set(words);
         }
     }  else if ( strcmp(words[0],"print") == 0 ) {
@@ -132,18 +133,19 @@ int interpreter(char* words[]){
     }
 }
 
+
 int main() {
     char* words1[3] = {"set","X","10"};
     interpreter(words1);
-    /*
     char* words2[3] = {"set","Y","30"};
     interpreter(words2);
-    char* words3[3] = {"set","Z","20"};
-    interpreter(words3);
-    */
+    char* words3[3] = {"set","X","_NONE_"};
+    printf("%d\n", interpreter(words3));
+
     char* words4[3] = {"print","X"};
     interpreter(words4);
 }
+
 /*
 COMMAND DESCRIPTION
 help            Displays all the commands
