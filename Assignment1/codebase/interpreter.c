@@ -32,7 +32,7 @@ int print(char * words[]){
     char* varName = words[1];
     char* value = getValue(varName);
 
-    if (strcmp(value,"NONE")==0) {
+    if (strcmp(value,"_NONE_")==0) {
         // If no variable with such name exists, display this message
         printf ("Variable does not exist\n");
     } else {
@@ -46,11 +46,7 @@ int print(char * words[]){
 This function takes an array of string.
 First string is the "run" command
 Second string is script filename to execute
-Returns:
-ERRORCODE -1 : RAN OUT OF SHELL MEMORY
-ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
-ERRORCODE -3 : FILE DOES NOT EXIST
-ERRORCODE -4 : UNKNOWN COMMAND. TYPE "help" FOR A MANUAL OF EVERY AVAILABLE COMMANDS
+Returns errorCode
 */
 int run(char * words[]){
 
@@ -83,20 +79,37 @@ int run(char * words[]){
 
 }
 
+/*
+This functions takes a parsed version of the user input.
+It will interpret the valid commands or return a bad error code if the command failed for some reason
+Returns:
+ERRORCODE  0 : No error and user wishes to continue
+ERRORCODE  1 : Users wishes to quit the shell / terminate script
+
+ERRORCODE -1 : RAN OUT OF SHELL MEMORY
+ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
+ERRORCODE -3 : FILE DOES NOT EXIST
+ERRORCODE -4 : UNKNOWN COMMAND. TYPE "help" FOR A MANUAL OF EVERY AVAILABLE COMMANDS
+*/
 int interpreter(char* words[]){
 
     //default errorCode if no error occurred AND user did not enter the "quit" command
     int errorCode = 0;
 
-    //At this point, we are checking for each possible commands entered
-    if ( strcmp(words[0],"help") ==0 ) {
+    printf("%s\n",words[0]);
 
+    //At this point, we are checking for each possible commands entered
+    if ( strcmp(words[0],"help") == 0 ) {
+        
         // if it's the "help" command, we display the description of every commands
-        printf("COMMANDS\t\t\tDESCRIPTIONS\n\n");
+        printf("-------------------------------------------------------------------------------------------------------\n");
+        printf("COMMANDS\t\t\tDESCRIPTIONS\n");
+        printf("-------------------------------------------------------------------------------------------------------\n");
         printf("quit\t\t\t\tTerminates the shell\n");
         printf("set VAR STRING\t\t\tAssigns the value STRING to the shell memory variable VAR\n");
         printf("print VAR\t\t\tDisplays the STRING value assigned to the shell memory variable VAR\n");
         printf("run SCRIPT.TXT\t\t\tExecutes the file SCRIPT.txt\n");
+        printf("-------------------------------------------------------------------------------------------------------\n");
 
     } else if ( strcmp(words[0],"quit") == 0) {
 
@@ -130,10 +143,12 @@ int interpreter(char* words[]){
 
         errorCode = run (words);
 
+    } else {
+        return -4;
     }
 }
 
-
+/*
 int main() {
     char* words1[3] = {"set","X","10"};
     interpreter(words1);
@@ -145,6 +160,7 @@ int main() {
     char* words4[3] = {"print","X"};
     interpreter(words4);
 }
+*/
 
 /*
 COMMAND DESCRIPTION

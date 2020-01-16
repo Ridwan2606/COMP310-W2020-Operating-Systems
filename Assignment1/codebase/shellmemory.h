@@ -9,6 +9,6 @@ int setVariable (char * varName, char * value);
 This function passes a variable name.
 The memory shell array is searched for that variable name.
 If found, it return the value,
-If not found, it return "NONE"
+If not found, it return "_NONE_"
 */
 char* getValue (char *var);
