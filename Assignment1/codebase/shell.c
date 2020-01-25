@@ -21,7 +21,7 @@ void displayCode(int errorCode){
         printf("ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS\n");
         break;
     case -3:
-        printf("ERRORCODE -3 : FILE DOES NOT EXIST\n");
+        printf("ERRORCODE -3 : FILE DOES NOT EXIST OR CANNOT BE OPENED\n");
         break;
     case -4:
         printf("ERRORCODE -4 : UNKNOWN COMMAND. TYPE 'help' FOR A MANUAL OF EVERY AVAILABLE COMMANDS\n");
@@ -32,6 +32,7 @@ void displayCode(int errorCode){
 }
 
 int parse(char ui[]){
+    //printf("In Parser: '%s'",ui);
     char tmp[200]; int a,b;
     char *words[10]; int w=0; // wordsIdx
     for (int i=0; i<10; i++){
@@ -39,14 +40,24 @@ int parse(char ui[]){
     }
     for(a=0; ui[a]==' ' && a<1000; a++); // skip white spaces
     while(ui[a] != '\0' && ui[a]!='\n' && a<1000) {
-        for(b=0; ui[a]!='\0' && ui[a]!='\n' && a<1000; a++, b++)
+        for(b=0; ui[a]!='\0' && ui[a]!='\n' && ui[a]!='\r' && ui[a]!=' ' && a<1000; a++, b++)
             tmp[b] = ui[a]; // extract a word
         tmp[b] = '\0';
         words[w] = strdup(tmp);
-        a++; 
+        if (ui[a]=='\0' || ui[a]=='\n' || ui[a]=='\r' ) break;
+        for(;ui[a]==' ' && a<1000; a++); // skip white spaces
         w++;
     }
+    
+    //printf("After Parser: '%s'\n",words[0]);
+    /*
+    printf("%s\n",words[1]);
+    printf("%s\n",words[2]);
+    printf("%s\n",words[3]);
+    return 0;
+    */
     return (interpreter(words));
+    free(words);
 }
 
 /*
@@ -58,7 +69,6 @@ int main(int argc, char const *argv[])
     printf(
     "\n----------------------------------\nWelcome to the Ridwan shell!\nVersion 1.0 Created January 2020\n----------------------------------\n");
     char prompt[15] = {'$','\0'};
-    
     char userinput[1000];
     int errorCode;
 
@@ -73,7 +83,7 @@ int main(int argc, char const *argv[])
 
         //If the user entered the "quit" command
         if ( errorCode == 1 ) {
-            printf("Farewell! Closing Ridwan Shell ......");
+            printf("Farewell! Closing Ridwan Shell ......\n");
             break;
         //else if an error occurred, display what that error is
         } else if ( errorCode != 0 ) {

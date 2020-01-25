@@ -53,27 +53,33 @@ int run(char * words[]){
     char * filename = words[1];
     FILE * fp = fopen(filename,"r");
     int errorCode = 0;
-
     // if file cannot be opened, return ERRORCODE -3
     if (fp==NULL) return -3;
 
     char buffer[1000];
-    fgets(buffer,999,fp);
+    //fgets(buffer,999,fp);
+
+    //printf("%s",buffer);
+    printf("/////////////////////////////// STARTING EXECUTION OF %s ///////////////////////////////\n",filename);
+
     while (!feof(fp)){
+        fgets(buffer,999,fp);
+        //printf("'%s' sent to Parser\n",buffer);
         errorCode = parse(buffer);
         // User input the "quit" command. Terminate execution of this script file.
         if (errorCode == 1) {
             // Run command successfully executed so ERRORCODE 0. Stop reading file.
-            printf("Terminating execution of %s....",filename);
             errorCode = 0;
             break;
         } else if (errorCode != 0) {
             // An error occurred. Display it and stop reading the file.
+            //printf("Reached non zero error code in run branch");
             displayCode(errorCode);
             break;
         }
-        fgets(buffer,999,fp);
+        //fgets(buffer,999,fp);
     }
+    printf("/////////////////////////////// Terminating execution of %s ///////////////////////////////\n",filename);
     fclose(fp);
     return errorCode;
 
@@ -93,10 +99,11 @@ ERRORCODE -4 : UNKNOWN COMMAND. TYPE "help" FOR A MANUAL OF EVERY AVAILABLE COMM
 */
 int interpreter(char* words[]){
 
+   //printf("Interpreter: [1]'%s' [2]'%s' [3]'%s'\n", words[0],words[1],words[2]);
     //default errorCode if no error occurred AND user did not enter the "quit" command
     int errorCode = 0;
 
-    printf("%s\n",words[0]);
+    //printf("Interpreter received: '%s'\n",words[0]);
 
     //At this point, we are checking for each possible commands entered
     if ( strcmp(words[0],"help") == 0 ) {
@@ -105,6 +112,7 @@ int interpreter(char* words[]){
         printf("-------------------------------------------------------------------------------------------------------\n");
         printf("COMMANDS\t\t\tDESCRIPTIONS\n");
         printf("-------------------------------------------------------------------------------------------------------\n");
+        printf("help\t\t\t\tDisplays all commands\n");
         printf("quit\t\t\t\tTerminates the shell\n");
         printf("set VAR STRING\t\t\tAssigns the value STRING to the shell memory variable VAR\n");
         printf("print VAR\t\t\tDisplays the STRING value assigned to the shell memory variable VAR\n");
@@ -122,10 +130,9 @@ int interpreter(char* words[]){
         // check for the presence or 2 more arguments
         // If one argument missing, return ERRORCODE -2 for invalid number of arguments
         if ( ( strcmp(words[1],"_NONE_") == 0 ) || ( strcmp(words[2],"_NONE_") == 0 ) ) {
-            return -2;
+            errorCode = -2;
         } else {
             // ERRORCODE -1 : Out of Memory might occur
-            printf("SET REACHED \n");
             errorCode = set(words);
         }
     }  else if ( strcmp(words[0],"print") == 0 ) {
@@ -141,11 +148,13 @@ int interpreter(char* words[]){
         // check if there's a second argument, return ERRORCODE -2 for invalid number of arguments
         if ( strcmp(words[1],"_NONE_") == 0 ) return -2;
 
-        errorCode = run (words);
-
+        //printf("Run Starting\n");
+        errorCode = run(words);
+        //printf("Run Ended\n");
     } else {
-        return -4;
+        errorCode = -4;
     }
+    return errorCode;
 }
 
 /*
