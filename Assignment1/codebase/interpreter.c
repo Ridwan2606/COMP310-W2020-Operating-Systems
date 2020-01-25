@@ -55,16 +55,10 @@ int run(char * words[]){
     int errorCode = 0;
     // if file cannot be opened, return ERRORCODE -3
     if (fp==NULL) return -3;
-
     char buffer[1000];
-    //fgets(buffer,999,fp);
-
-    //printf("%s",buffer);
     printf("/////////////////////////////// STARTING EXECUTION OF %s ///////////////////////////////\n",filename);
-
     while (!feof(fp)){
         fgets(buffer,999,fp);
-        //printf("'%s' sent to Parser\n",buffer);
         errorCode = parse(buffer);
         // User input the "quit" command. Terminate execution of this script file.
         if (errorCode == 1) {
@@ -73,16 +67,15 @@ int run(char * words[]){
             break;
         } else if (errorCode != 0) {
             // An error occurred. Display it and stop reading the file.
-            //printf("Reached non zero error code in run branch");
-            displayCode(errorCode);
+            //removing the extra carriage return
+            buffer[strlen(buffer)-2]='\0';
+            displayCode(errorCode,buffer);
             break;
         }
-        //fgets(buffer,999,fp);
     }
     printf("/////////////////////////////// Terminating execution of %s ///////////////////////////////\n",filename);
     fclose(fp);
     return errorCode;
-
 }
 
 /*
@@ -91,20 +84,14 @@ It will interpret the valid commands or return a bad error code if the command f
 Returns:
 ERRORCODE  0 : No error and user wishes to continue
 ERRORCODE  1 : Users wishes to quit the shell / terminate script
-
 ERRORCODE -1 : RAN OUT OF SHELL MEMORY
 ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
 ERRORCODE -3 : FILE DOES NOT EXIST
-ERRORCODE -4 : UNKNOWN COMMAND. TYPE "help" FOR A MANUAL OF EVERY AVAILABLE COMMANDS
+ERRORCODE -4 : UNKNOWN COMMAND. TRY "help"
 */
 int interpreter(char* words[]){
-
-   //printf("Interpreter: [1]'%s' [2]'%s' [3]'%s'\n", words[0],words[1],words[2]);
     //default errorCode if no error occurred AND user did not enter the "quit" command
     int errorCode = 0;
-
-    //printf("Interpreter received: '%s'\n",words[0]);
-
     //At this point, we are checking for each possible commands entered
     if ( strcmp(words[0],"help") == 0 ) {
         
@@ -148,61 +135,14 @@ int interpreter(char* words[]){
         // check if there's a second argument, return ERRORCODE -2 for invalid number of arguments
         if ( strcmp(words[1],"_NONE_") == 0 ) return -2;
 
-        //printf("Run Starting\n");
-        errorCode = run(words);
-        //printf("Run Ended\n");
+        //Error will be handled in the run function. We can assume that after the run 
+        //function terminate, the errorCode is 0.
+        run(words);
     } else {
+        // Error code for unknown command
         errorCode = -4;
     }
+
     return errorCode;
+    
 }
-
-/*
-int main() {
-    char* words1[3] = {"set","X","10"};
-    interpreter(words1);
-    char* words2[3] = {"set","Y","30"};
-    interpreter(words2);
-    char* words3[3] = {"set","X","_NONE_"};
-    printf("%d\n", interpreter(words3));
-
-    char* words4[3] = {"print","X"};
-    interpreter(words4);
-}
-*/
-
-/*
-COMMAND DESCRIPTION
-help            Displays all the commands
-quit            Exits / terminates the shell with “Bye!”
-set VAR STRING  Assigns a value to shell memory
-print VAR       Displays the STRING assigned to VAR
-run SCRIPT.TXT  Executes the file SCRIPT.TXT
-There are no other commands (for now).
-If the user inputs an unsupported command the shell displays “Unknown command”.
-
-The command set VAR STRING first checks to see if VAR already exists. If it does exist,
-STRING overwrites the previous value assigned to VAR. If VAR does not exist, then a new entry is
-added to the shell memory where the variable name is VAR and the contents of the variable is
-STRING. For example: set x 10 creates a new variable x and assigns to it the string 10.
-Another example: set name Bob creates a new variable called name with string value Bob.
-Another example: set x Mary, replaced the value 10 with Mary. 
-
-Implement the shell memory as an array of struct, not as a linked list. Struct MEM { char *var; char *value; };
-
-The command print VAR first checks to see if VAR exists. If it does not exist, then it displays
-the error “Variable does not exist”. If VAR does exist, then it displays the STRING. For example:
-print x from the above example will display Mary.
-
-The command run SCRIPT.TXT assumes that a text file exists with the provided file name. It
-opens that text file and then sends each line one at a time to the interpreter (as seen in class).
-The interpreter treats each line of text as a command. Each line affects the shell and the UI. At
-the end of the script, the file is closed, and the command line prompt is displayed once more.
-While the script executes the command line prompt is not displayed. For example: run
-test.txt will begin by opening the file test.txt. If that fails, then an error message is
-displayed: “Script not found”. If the file is opened, then each line of the file is interpreted. At the
-end, the file is closed, and the command line prompt is displayed. If an error occurs while
-executing the script due a command syntax error, then the error is displayed and the script
-stops executing.
-*/
-

@@ -4,27 +4,27 @@
 #include"interpreter.h"
 
 /*
-This functions passes an int errorCode and display the 
+This functions passes an int errorCode and command string and display the 
 appropriate error message for that errorCode
 ERRORCODE -1 : RAN OUT OF SHELL MEMORY
 ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
-ERRORCODE -3 : FILE DOES NOT EXIST
-ERRORCODE -4 : UNKNOWN COMMAND. TYPE "help" FOR A MANUAL OF EVERY AVAILABLE COMMANDS
+ERRORCODE -3 : SCRIPT NOT FOUND
+ERRORCODE -4 : UNKNOWN COMMAND.
 */
-void displayCode(int errorCode){
+void displayCode(int errorCode, char * command){
     switch (errorCode)
     {
     case -1:
         printf("ERRORCODE -1 : RAN OUT OF SHELL MEMORY\n");
         break;
     case -2:
-        printf("ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS\n");
+        printf("ERRORCODE -2 : '%s' INSUFFICIENT NUMBER OF ARGUMENTS. TRY 'help'\n", command);
         break;
     case -3:
-        printf("ERRORCODE -3 : FILE DOES NOT EXIST OR CANNOT BE OPENED\n");
+        printf("ERRORCODE -3 : SCRIPT NOT FOUND\n");
         break;
     case -4:
-        printf("ERRORCODE -4 : UNKNOWN COMMAND. TYPE 'help' FOR A MANUAL OF EVERY AVAILABLE COMMANDS\n");
+        printf("ERRORCODE -4 : '%s' IS AN UNKNOWN COMMAND. TRY 'help'\n", command);
         break;
     }
 
@@ -48,16 +48,8 @@ int parse(char ui[]){
         for(;ui[a]==' ' && a<1000; a++); // skip white spaces
         w++;
     }
-    
-    //printf("After Parser: '%s'\n",words[0]);
-    /*
-    printf("%s\n",words[1]);
-    printf("%s\n",words[2]);
-    printf("%s\n",words[3]);
-    return 0;
-    */
     return (interpreter(words));
-    free(words);
+    //free(words);
 }
 
 /*
@@ -80,14 +72,15 @@ int main(int argc, char const *argv[])
         fgets(userinput,999,stdin);
         // parses and interprets the command
         errorCode = parse(userinput);
-
         //If the user entered the "quit" command
         if ( errorCode == 1 ) {
-            printf("Farewell! Closing Ridwan Shell ......\n");
+            printf("----------------------------------\nExiting Ridwan Shell. Farewell...\n----------------------------------\n");
             break;
         //else if an error occurred, display what that error is
         } else if ( errorCode != 0 ) {
-            displayCode(errorCode);
+            //removing the extra carriage return
+            userinput[strlen(userinput)-1]='\0';
+            displayCode(errorCode, userinput);
         }
     }
     return 0;
