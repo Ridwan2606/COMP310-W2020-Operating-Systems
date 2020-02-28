@@ -137,7 +137,7 @@ int interpreter(char* words[]){
 
         //Error will be handled in the run function. We can assume that after the run 
         //function terminate, the errorCode is 0.
-        errorCode = run(words);
+        run(words);
     } else {
         // Error code for unknown command
         errorCode = -4;
