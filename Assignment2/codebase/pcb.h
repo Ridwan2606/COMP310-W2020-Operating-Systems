@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 /*
 PCB has 3 fields
 PC : Points to the the current line reached for that program
@@ -11,9 +9,7 @@ typedef struct PCB
     int PC;
     int start;
     int end;
-    PCB* next;
 }PCB;
-
 
 /*
 Passes 2 parameters (start , end)
@@ -22,13 +18,4 @@ PC = start
 start = start
 end = end
 */
-PCB* makePCB(int start, int end){
-    PCB* pcb = (PCB*)malloc(sizeof(PCB));
-    pcb->PC = start;
-    pcb->start = start;
-    pcb->end = end;
-    pcb->next = NULL;
-    return pcb;
-}
-
-
+PCB* makePCB(int start, int end);

@@ -1,5 +1,15 @@
+#include<stdio.h>
 #include"shell.h"
+#include"pcb.h"
 
+typedef struct ReadyQueueNode {
+    PCB PCB;
+    ReadyQueueNode* next;
+} ReadyQueueNode;
+
+ReadyQueueNode* head = NULL;
+ReadyQueueNode* tail = NULL;
+int sizeOfQueue = 0;
 
 int main(int argc, char const *argv[])
 {
@@ -8,10 +18,43 @@ int main(int argc, char const *argv[])
     shellUI();
 }
 /*
-1. It calls void addToRAM(FILE *p, int *start, int *end) from ram.c 
-to add the source code to the next available cells in ram[]. 
-2. It calls PCB* makePCB(int start, int end) from pcb.c to create a PCB instance 
-using malloc. 
-3. It calls void addToReady(PCB *) from kernel.c to add the PCB to the 
-tail of the Ready Queue 
+Adds a pcb to the tail of the linked list
 */
+void addToReady(PCB * pcb) {
+    ReadyQueueNode* newNode = (ReadyQueueNode *)malloc(sizeof(ReadyQueueNode));
+    newNode->PCB = *pcb;
+    newNode->next = NULL;
+    if (head == NULL){
+        head = newNode;
+        tail = newNode;
+    } else {
+        tail->next = newNode;
+    }
+    sizeOfQueue++;
+}
+
+/*
+Returns the size of the queue
+*/
+int size(){
+    return sizeOfQueue;
+}
+
+/*
+Pops the pcb at the head of the linked list.
+pop will cause an error if linkedlist is empty.
+Always check size of queue using size()
+*/
+PCB pop(){
+    PCB topNode = head->PCB;
+    if (head == tail){
+        head = NULL;
+        tail = NULL;
+    } else {
+        head = head->next;
+    }
+    sizeOfQueue--;
+    return topNode;
+}
+
+

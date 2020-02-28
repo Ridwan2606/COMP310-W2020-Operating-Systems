@@ -78,6 +78,10 @@ int run(char * words[]){
     return errorCode;
 }
 
+int exec(char * words[]){
+    // oh boi
+}
+
 /*
 This functions takes a parsed version of the user input.
 It will interpret the valid commands or return a bad error code if the command failed for some reason
@@ -138,6 +142,12 @@ int interpreter(char* words[]){
         //Error will be handled in the run function. We can assume that after the run 
         //function terminate, the errorCode is 0.
         errorCode = run(words);
+    } else if ( strcmp(words[0],"exec") == 0 ) {
+        // if it's the "exec" command
+        // check if there's at least 2 arguments
+        if ( strcmp(words[1],"_NONE_") == 0 ) return -2;
+
+        errorCode = exec(words);
     } else {
         // Error code for unknown command
         errorCode = -4;
