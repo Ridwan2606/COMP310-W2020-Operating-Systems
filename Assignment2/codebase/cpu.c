@@ -27,7 +27,7 @@ int run(int quanta){
     for (int i = 0; i < quanta; i++)
     {
         strcpy(CPU.IR,ram[CPU.IP]);
-        int errorCode = interpreter(CPU.IR);
+        int errorCode = parse(CPU.IR);
         // Do error checking and if error, return error
         if (errorCode != 0){
             // Display error message if fatal

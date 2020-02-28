@@ -2,6 +2,7 @@
 #include"shell.h"
 #include"pcb.h"
 #include"ram.h"
+#include"cpu.h"
 
 /*
 This is a node in the Ready Queue implemented as 
@@ -11,7 +12,7 @@ PCB: PCB
 next: next node
 */
 typedef struct ReadyQueueNode {
-    PCB PCB;
+    PCB*  PCB;
     ReadyQueueNode* next;
 } ReadyQueueNode;
 
@@ -28,9 +29,9 @@ int main(int argc, char const *argv[])
 /*
 Adds a pcb to the tail of the linked list
 */
-void addToReady(PCB * pcb) {
+void addToReady(struct PCB* pcb) {
     ReadyQueueNode* newNode = (ReadyQueueNode *)malloc(sizeof(ReadyQueueNode));
-    newNode->PCB = *pcb;
+    newNode->PCB = pcb;
     newNode->next = NULL;
     if (head == NULL){
         head = newNode;
@@ -53,8 +54,8 @@ Pops the pcb at the head of the linked list.
 pop will cause an error if linkedlist is empty.
 Always check size of queue using size()
 */
-PCB* pop(){
-    PCB* topNode = head;
+struct PCB* pop(){
+    PCB* topNode = head->PCB;
     if (head == tail){
         head = NULL;
         tail = NULL;
@@ -64,7 +65,6 @@ PCB* pop(){
     sizeOfQueue--;
     return topNode;
 }
-
 
 /*
 Passes a filename
@@ -97,7 +97,13 @@ int scheduler(){
     // set CPU quanta to default, IP to -1, IR = NULL
     while (size() != 0){
         //pop head of queue
+        PCB* pcb = pop();
         //copy PC of PCB to IP of CPU
+        CPU.IP = pcb->PC;
+        int remaining = (pcb->end) - (pcb->PC) + 1;
+        if (DEFAULT_QUANTA <= remaining) {
+            // end.....
+        }
         //call run(2) or run(1) depending on remaining lines from end
         // Maybe have an error code from run? ( better to display errorMsg directly from run)
         // If error or terminated, dont put it back on ready queue. call removeFromRam and Free the PCB
