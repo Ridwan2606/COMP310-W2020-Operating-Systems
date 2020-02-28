@@ -1,7 +1,15 @@
 #include<stdio.h>
 #include"shell.h"
 #include"pcb.h"
+#include"ram.h"
 
+/*
+This is a node in the Ready Queue implemented as 
+a linked list.
+A node holds a PCB and a pointer to the next node.
+PCB: PCB
+next: next node
+*/
 typedef struct ReadyQueueNode {
     PCB PCB;
     ReadyQueueNode* next;
@@ -57,12 +65,32 @@ PCB* pop(){
     return topNode;
 }
 
+
+/*
+Passes a filename
+Opens the file, copies the content in the RAM.
+Creates a PCB for that program.
+Adds the PCB on the ready queue.
+Return an errorCode:
+ERRORCODE 0 : NO ERROR
+ERRORCODE -3 : SCRIPT NOT FOUND
+ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
+*/
 int myinit(char* filename){
     // Open the filename to get FILE *
     // call addToRam on that File *
-    // If error, make note
+    // If error (check via start/end variable), return that error
     // Else create pcb using MakePCB
     // Then add it to the ReadyQueue
+    FILE * fp = fopen(filename,"r");
+    if (fp == NULL) return -3;
+    int start;
+    int end;
+    addToRAM(fp,&start,&end);
+    if (start == -1) return -5;
+    PCB* pcb = makePCB(start,end);
+    addToReady(pcb);
+    return 0;
 }
 
 int scheduler(){
