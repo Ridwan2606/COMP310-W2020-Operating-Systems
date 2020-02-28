@@ -26,6 +26,8 @@ void displayCode(int errorCode, char * command){
     case -4:
         printf("ERRORCODE -4 : '%s' IS AN UNKNOWN COMMAND. TRY 'help'\n", command);
         break;
+    case -5:
+        printf("ERRORCODE -5 : NOT ENOUGH RAM TO ADD PROGRAM '%s'\n",command);
     }
 
     return;

@@ -79,7 +79,13 @@ int run(char * words[]){
 }
 
 int exec(char * words[]){
-    // oh boi
+    //filter out duplicated text file names
+
+    //for each file
+        //call myInit on that Filename
+        // if error, display errorMessage? call displaycode on that.
+    
+    // Call the scheduler
 }
 
 /*
@@ -144,8 +150,8 @@ int interpreter(char* words[]){
         errorCode = run(words);
     } else if ( strcmp(words[0],"exec") == 0 ) {
         // if it's the "exec" command
-        // check if there's at least 2 arguments
-        if ( strcmp(words[1],"_NONE_") == 0 ) return -2;
+        // check if there's at least 2 arguments and not >= 4 arguments
+        if ( strcmp(words[1],"_NONE_") == 0  || strcmp(words[4],"_NONE_") != 0 ) return -2;
 
         errorCode = exec(words);
     } else {
