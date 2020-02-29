@@ -46,9 +46,10 @@ void addToRAM (FILE *p, int *start, int *end){
     // If RAM is full and we have not reached the end of the 
     // file, remove the content from RAM and return -1 in *start,*end
     // Update nextFree as well
+    
     if (i>=1000 && !feof(p)){
-        removeFromRam(*start,1000);
-        nextFree = *start;
+        removeFromRam(0,i-1);
+        nextFree = 0;
         *start = -1;
         *end = -1;        
     // Else update the nextFree spot and *end

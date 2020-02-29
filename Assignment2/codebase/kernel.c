@@ -59,12 +59,14 @@ Always check size of queue using size()
 */
 struct PCB* pop(){
     PCB* topNode = head->PCB;
+    ReadyQueueNode * temp = head;
     if (head == tail){
         head = NULL;
         tail = NULL;
     } else {
         head = head->next;
     }
+    free(temp);
     sizeOfQueue--;
     return topNode;
 }
@@ -90,6 +92,7 @@ int myinit(char* filename){
     int start;
     int end;
     addToRAM(fp,&start,&end);
+    fclose(fp);
     if (start == -1) return -5;
     PCB* pcb = makePCB(start,end);
     addToReady(pcb);
@@ -129,20 +132,17 @@ int scheduler(){
     resetRAM();
     return 0;
 }
+
 /*
-a. It checks to see if the CPU is available.  
-This means that the quanta is finished or nothing is currently assigned to the CPU 
-b. It copies the PC from the PCB into the IP of the CPU 
-c. It calls the run(quanta) function within cpu.c to run the script 
-by copying quanta lines of code from ram[] using IP into the IR, 
-which then calls: interpreter(IR) 
-d. This executes quanta instructions from the script or until the script file is at end. 
-e. If the program is not at the end, then the PCB PC pointer is updated
- with the IP value and the PCB is placed at the tail of the ready queue. 
- f. If the program is at the end, then the PCB terminates (as described previously / above) 
-
-When the Ready queue is empty, this means that all the programs have terminated.  
-At this point the exec() function ends, and the user sees the shell command line prompt. 
+Flushes every pcb off the ready queue in the case of a load error
 */
-
+void emptyReadyQueue(){
+    while (head!=NULL){
+        ReadyQueueNode * temp = head;
+        head = head->next;
+        free(temp->PCB);
+        free(temp);
+    }
+    sizeOfQueue =0;
+}
 

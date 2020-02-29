@@ -29,3 +29,8 @@ ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
 int myinit(char*);
 
 int scheduler();
+
+/*
+Flushes every pcb off the ready queue in the case of a load error
+*/
+void emptyReadyQueue();

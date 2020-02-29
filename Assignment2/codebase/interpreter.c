@@ -106,6 +106,7 @@ int exec(char * words[]){
                 if ( errorCode < 0){
                     displayCode(errorCode,words[i]);
                     printf("EXEC COMMAND ABORTED...\n");
+                    emptyReadyQueue();
                     return 0;
                 }
             }
