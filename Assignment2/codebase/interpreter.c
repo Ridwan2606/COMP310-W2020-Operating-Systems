@@ -85,47 +85,36 @@ int run(char * words[]){
 int exec(char * words[]){
     //filter out duplicated text file names
     char * filename[3] = { "_NONE_", "_NONE_", "_NONE_"};
-
-    /*
-    The exec command takes one to three arguments.  
-    Each argument is the name of a different mysh script filename.  
-    For this assignment, exec does not permit us to launch multiple 
-    scripts with the same filename. 
-    If you try to do that your shell displays the error, 
-    “Error: Script <name> already loaded”.  
-    All program script execution terminates. 
-    If there is a load error, then no programs run. 
-    The user will have to input the exec command again. 
-    */
-
-    //Recheck indexes
+    int nextFree = 0;
+    int errorCode = 0;
     for (int i = 1; i <= 3; i++)
     {
         if ( strcmp(words[i],"_NONE_") != 0 ) {
             int duplicate = FALSE;
             for (int j = 0; j<i-1; j++){
                 if ( strcmp(filename[j],words[i]) == 0 ) {
-                    // we got a duplicate
-                    // print message
+                    duplicate = TRUE;
+                    break;
                 }
             }
-            addToReady();
+            if (duplicate){
+                displayCode(-6,words[i]);
+            } else {
+                filename[nextFree] = strdup(words[i]);
+                nextFree++;
+                errorCode = myinit(words[i]);
+                if ( errorCode < 0){
+                    displayCode(errorCode,words[i]);
+                    printf("EXEC COMMAND ABORTED...\n");
+                    return 0;
+                }
+            }
+        // We've ran through every filenames, so get out of the for loop
         } else {
             break;
         }
-
-        // perform init on the filename
     }
-
-    
     scheduler();
-    
-
-    //for each file
-        //call myInit on that Filename
-        // if error, display errorMessage? call displaycode on that.
-    
-    // Call the scheduler
 }
 
 /*

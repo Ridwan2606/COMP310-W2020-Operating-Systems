@@ -1,3 +1,6 @@
+#define TRUE 1
+#define FALSE 0
+
 /*
 This functions takes a parsed version of the user input.
 It will interpret the valid commands or return a bad error code if the command failed for some reason

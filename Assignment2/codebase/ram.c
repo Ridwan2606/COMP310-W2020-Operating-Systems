@@ -1,6 +1,14 @@
 #include<stdio.h>
 
+/*
+Stores the index of the next available block of cell
+*/
 int nextFree = 0;
+
+/*
+Ram structure implemented as an array.
+Size is 1000 strings
+*/
 char *ram[1000]; 
 
 /*
@@ -53,7 +61,7 @@ void addToRAM (FILE *p, int *start, int *end){
 /*
 Reset the pointer to the free cell back to index 0
 */
-void reset(){
+void resetRAM(){
     nextFree = 0;
 }
 

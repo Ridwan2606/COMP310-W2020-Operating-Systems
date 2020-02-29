@@ -3,11 +3,12 @@
 #include"pcb.h"
 #include"ram.h"
 #include"cpu.h"
+#include"interpreter.h"
 
 /*
 This is a node in the Ready Queue implemented as 
 a linked list.
-A node holds a PCB and a pointer to the next node.
+A node holds a PCB pointer and a pointer to the next node.
 PCB: PCB
 next: next node
 */
@@ -38,6 +39,7 @@ void addToReady(struct PCB* pcb) {
         tail = newNode;
     } else {
         tail->next = newNode;
+        tail = newNode;
     }
     sizeOfQueue++;
 }
@@ -95,23 +97,36 @@ int myinit(char* filename){
 
 int scheduler(){
     // set CPU quanta to default, IP to -1, IR = NULL
+    CPU.quanta = DEFAULT_QUANTA;
+    CPU.IP = -1;
     while (size() != 0){
         //pop head of queue
         PCB* pcb = pop();
         //copy PC of PCB to IP of CPU
         CPU.IP = pcb->PC;
+
+        int isOver = FALSE;
         int remaining = (pcb->end) - (pcb->PC) + 1;
-        if (DEFAULT_QUANTA <= remaining) {
-            // end.....
+        int quanta = DEFAULT_QUANTA;
+
+        if (DEFAULT_QUANTA >= remaining) {
+            isOver = TRUE;
+            quanta = remaining;
         }
-        //call run(2) or run(1) depending on remaining lines from end
-        // Maybe have an error code from run? ( better to display errorMsg directly from run)
-        // If error or terminated, dont put it back on ready queue. call removeFromRam and Free the PCB
-        // Set PC of that PCB to +2
-        // if PC at the end, Terminate, call removeFromRam and Free the PCB
-        // Else put it at the tail using addToReady()
+
+        int errorCode = run(quanta);
+
+        if ( errorCode<0 || isOver ){
+            removeFromRam(pcb->start,pcb->end);
+            free(pcb);
+        } else {
+            pcb->PC += DEFAULT_QUANTA;
+            addToReady(pcb);
+        }
     }
     // reset RAM
+    resetRAM();
+    return 0;
 }
 /*
 a. It checks to see if the CPU is available.  

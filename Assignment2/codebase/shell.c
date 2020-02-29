@@ -30,14 +30,14 @@ void displayCode(int errorCode, char * command){
         printf("ERRORCODE -4 : '%s' IS AN UNKNOWN COMMAND. TRY 'help'\n", command);
         break;
     case -5:
-        printf("ERRORCODE -5 : NOT ENOUGH RAM TO ADD PROGRAM '%s'\n",command);
+        printf("ERRORCODE -5 : NOT ENOUGH RAM TO ADD PROGRAM.'%s'\n",command);
         break;
     case -6:
         printf("ERRORCODE -6 : SCRIPT %s ALREADY LOADED \n",command);
         break;
     case -7:
         // Useless actually
-        printf("ERRORCODE -7 : LOAD ERROR. EXEC ABORTED \n");
+        printf("ERRORCODE -7 : LOAD ERROR.\n");
         break;
     }
 
