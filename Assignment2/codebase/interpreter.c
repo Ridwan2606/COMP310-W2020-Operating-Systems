@@ -115,7 +115,22 @@ int exec(char * words[]){
             break;
         }
     }
+
+    printf("|----------| ");
+    printf("\tSTARTING CONCURRENT PROGRAMS ( ");
+    for (int i = 0; i < 3; i++)
+    {
+        if ( strcmp(filename[i],"_NONE_") != 0 ){
+            printf("%s ", filename[i]);
+        }
+    }
+    printf(")\t|----------|\n");
+
     scheduler();
+
+    printf("|----------| ");
+    printf("\tTERMINATING ALL CONCURRENT PROGRAMS");
+    printf("\t|----------|\n");
 }
 
 /*
@@ -178,7 +193,7 @@ int interpreter(char* words[]){
 
         //Error will be handled in the run function. We can assume that after the run 
         //function terminate, the errorCode is 0.
-        run(words);
+        errorCode = run(words);
     } else if ( strcmp(words[0],"exec") == 0 ) {
         // if it's the "exec" command
         // check if there's at least 2 arguments and not >= 4 arguments
