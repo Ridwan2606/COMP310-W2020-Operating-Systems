@@ -12,7 +12,6 @@ ERRORCODE -3 : SCRIPT NOT FOUND
 ERRORCODE -4 : UNKNOWN COMMAND.
 ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
 ERRORCODE -6 : SCRIPT <NAME> ALREADY LOADED (EXEC)
-ERRORCODE -7 : LOAD ERROR (EXEC)
 */
 void displayCode(int errorCode, char * command){
     switch (errorCode)
@@ -34,10 +33,6 @@ void displayCode(int errorCode, char * command){
         break;
     case -6:
         printf("ERRORCODE -6 : %s ALREADY LOADED \n",command);
-        break;
-    case -7:
-        // Useless actually
-        printf("ERRORCODE -7 : LOAD ERROR.\n");
         break;
     }
 
@@ -72,7 +67,7 @@ users gets to use the shell.
 int shellUI()
 {
     printf(
-    "\n----------------------------------\nKernel 1.0 loaded!\nWelcome to the Ridwan shell!\nShell Version 2.0 Updated February 2020\n----------------------------------\n");
+    "\n----------------------------------\nKernel 1.0 loaded!\nWelcome to the Ridwan Shell!\nShell Version 2.0 Updated February 2020\n----------------------------------\n");
     char prompt[15] = {'$','\0'};
     char userinput[1000];
     int errorCode;

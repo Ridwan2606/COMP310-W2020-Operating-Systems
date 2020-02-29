@@ -131,6 +131,7 @@ int exec(char * words[]){
     printf("|----------| ");
     printf("\tTERMINATING ALL CONCURRENT PROGRAMS");
     printf("\t|----------|\n");
+    return 0;
 }
 
 /*
