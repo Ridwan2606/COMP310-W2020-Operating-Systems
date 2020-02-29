@@ -11,7 +11,7 @@ struct MEM {
 int memorySize = 25;
 
 // This global variable stores the index of the last stored variable. Set to 0 at first. Its limit is the memory size
-int tail= 0;
+int lastVarIndex= 0;
 
 /*
 This function passes the name of a variable.
@@ -20,7 +20,7 @@ If found, it returns the index of the matched variable.
 If not found, it returns -1
 */
 int findVariable(char * varName) {
-    for (int i = 0; i<tail; i++){
+    for (int i = 0; i<lastVarIndex; i++){
         if ( strcmp(environmentVars[i].var,varName) == 0 ){
             return i;
         }
@@ -30,15 +30,15 @@ int findVariable(char * varName) {
 
 /*
 This functions takes a variable name and a value and adds this set packaged in a MEM object at the end of
-the shell memory array. It also increments the tail global variable.
+the shell memory array. It also increments the lastVarIndex global variable.
 If running out of memory, return ERRORCODE: -1
 */
 int addVariable (char *var, char* value){
 
-    if (tail == memorySize) return -1;
-    environmentVars[tail].var = var;
-    environmentVars[tail].value = value;
-    tail ++;
+    if (lastVarIndex == memorySize) return -1;
+    environmentVars[lastVarIndex].var = var;
+    environmentVars[lastVarIndex].value = value;
+    lastVarIndex ++;
     return 0;
 }
 

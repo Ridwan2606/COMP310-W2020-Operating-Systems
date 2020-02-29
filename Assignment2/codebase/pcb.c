@@ -26,7 +26,6 @@ PCB* makePCB(int start, int end){
     pcb->PC = start;
     pcb->start = start;
     pcb->end = end;
-    pcb->next = NULL;
     return pcb;
 }
 

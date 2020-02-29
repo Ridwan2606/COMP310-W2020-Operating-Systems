@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include"shell.h"
 #include"pcb.h"
 #include"ram.h"
@@ -14,7 +15,7 @@ next: next node
 */
 typedef struct ReadyQueueNode {
     PCB*  PCB;
-    ReadyQueueNode* next;
+    struct ReadyQueueNode* next;
 } ReadyQueueNode;
 
 ReadyQueueNode* head = NULL;
@@ -116,7 +117,7 @@ int scheduler(){
 
         int errorCode = run(quanta);
 
-        if ( errorCode<0 || isOver ){
+        if ( errorCode!=0 || isOver ){
             removeFromRam(pcb->start,pcb->end);
             free(pcb);
         } else {

@@ -7,7 +7,7 @@
 This functions passes an int errorCode and command string and display the 
 appropriate error message for that errorCode
 ERRORCODE -1 : RAN OUT OF SHELL MEMORY
-ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
+ERRORCODE -2 : INCORRECT NUMBER OF ARGUMENTS
 ERRORCODE -3 : SCRIPT NOT FOUND
 ERRORCODE -4 : UNKNOWN COMMAND.
 ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
@@ -21,7 +21,7 @@ void displayCode(int errorCode, char * command){
         printf("ERRORCODE -1 : RAN OUT OF SHELL MEMORY\n");
         break;
     case -2:
-        printf("ERRORCODE -2 : '%s' INSUFFICIENT NUMBER OF ARGUMENTS. TRY 'help'\n", command);
+        printf("ERRORCODE -2 : '%s' INCORRECT NUMBER OF ARGUMENTS. TRY 'help'\n", command);
         break;
     case -3:
         printf("ERRORCODE -3 : SCRIPT NOT FOUND\n");
@@ -33,7 +33,7 @@ void displayCode(int errorCode, char * command){
         printf("ERRORCODE -5 : NOT ENOUGH RAM TO ADD PROGRAM.'%s'\n",command);
         break;
     case -6:
-        printf("ERRORCODE -6 : SCRIPT %s ALREADY LOADED \n",command);
+        printf("ERRORCODE -6 : %s ALREADY LOADED \n",command);
         break;
     case -7:
         // Useless actually

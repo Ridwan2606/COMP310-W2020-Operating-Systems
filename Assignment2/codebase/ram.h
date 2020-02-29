@@ -1,3 +1,4 @@
+#include<stdio.h>
 /*
 Ram structure implemented as an array.
 Size is 1000 strings

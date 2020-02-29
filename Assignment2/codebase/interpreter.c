@@ -52,7 +52,7 @@ First string is the "run" command
 Second string is script filename to execute
 Returns errorCode
 */
-int run(char * words[]){
+static int run(char * words[]){
 
     char * filename = words[1];
     FILE * fp = fopen(filename,"r");
@@ -79,7 +79,7 @@ int run(char * words[]){
     }
     printf("/////////////////////////////// Terminating execution of %s ///////////////////////////////\n",filename);
     fclose(fp);
-    return errorCode;
+    return 0;
 }
 
 int exec(char * words[]){
@@ -124,7 +124,7 @@ Returns:
 ERRORCODE  0 : No error and user wishes to continue
 ERRORCODE  1 : Users wishes to quit the shell / terminate script
 ERRORCODE -1 : RAN OUT OF SHELL MEMORY
-ERRORCODE -2 : INSUFFICIENT NUMBER OF ARGUMENTS
+ERRORCODE -2 : INCORRECT NUMBER OF ARGUMENTS
 ERRORCODE -3 : FILE DOES NOT EXIST
 ERRORCODE -4 : UNKNOWN COMMAND. TRY "help"
 */
@@ -143,6 +143,7 @@ int interpreter(char* words[]){
         printf("set VAR STRING\t\t\tAssigns the value STRING to the shell memory variable VAR\n");
         printf("print VAR\t\t\tDisplays the STRING value assigned to the shell memory variable VAR\n");
         printf("run SCRIPT.TXT\t\t\tExecutes the file SCRIPT.txt\n");
+        printf("exec p1 p2 p3\t\t\tExecutes programs p1 p2 p3 concurrently\n");
         printf("-------------------------------------------------------------------------------------------------------\n");
 
     } else if ( strcmp(words[0],"quit") == 0) {
@@ -176,7 +177,7 @@ int interpreter(char* words[]){
 
         //Error will be handled in the run function. We can assume that after the run 
         //function terminate, the errorCode is 0.
-        errorCode = run(words);
+        run(words);
     } else if ( strcmp(words[0],"exec") == 0 ) {
         // if it's the "exec" command
         // check if there's at least 2 arguments and not >= 4 arguments

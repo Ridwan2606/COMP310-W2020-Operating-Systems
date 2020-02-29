@@ -1,4 +1,4 @@
-
+#include "pcb.h"
 /*
 Adds a pcb to the tail of the linked list
 */

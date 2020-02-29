@@ -1,0 +1,10 @@
+set x 10
+print x
+set x A
+1dfgbhnjmntynytfrdfgndfnbtfrdft
+bjknk
+print x
+print x
+print x
+print x
+quit

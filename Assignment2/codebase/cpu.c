@@ -32,6 +32,7 @@ int run(int quanta){
         if (errorCode != 0){
             // Display error message if fatal
             if (errorCode < 0){
+                ram[CPU.IP][strlen(ram[CPU.IP])-2]='\0';
                 displayCode(errorCode,ram[CPU.IP]);
             }
             return errorCode;
