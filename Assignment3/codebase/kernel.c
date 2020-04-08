@@ -31,7 +31,7 @@ int boot(){
     //Clears the RAM
     removeFromRam(0,40);
     //Clears the backing store
-    system("> BackingStore");
+    system("mkdir BackingStore");
 }
 
 /*
