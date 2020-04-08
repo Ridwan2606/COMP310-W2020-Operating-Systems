@@ -23,8 +23,15 @@ int countTotalPages(FILE* fp){
 }
 
 void loadPage(int pageNumber, FILE* fp, int frameNumber){
+    //Moves file pointer to the required page
+    fseek(fp, pageNumber*4, SEEK_SET); 
+    // Adds that page to the required frame in RAM
+    addFrameToRAM(fp,frameNumber);
+    //Reset file pointer to the beginning of the while
+    rewind(fp);
 }
 
+/*
 void loadPage2(int pageNumber, FILE* fp, int frameNumber){
 	rewind(fp);//reset file pointer just in case
 	//move the fp to the proper page
@@ -49,6 +56,7 @@ void loadPage2(int pageNumber, FILE* fp, int frameNumber){
 	rewind(fp);
 	//page is loaded into desired frame and fp is reset to beginning
 }
+*/
 
 int findFrame(){
     int found = FALSE;
@@ -89,4 +97,24 @@ int findFrame(){
 	}
 	return frame;
     */
+}
+
+int findVictim(struct PCB* p){
+	int toReturn = 0;
+	int ran = rand()%10;
+	if(hasFrame(p,ran)==1){//if the pcb does not have the random frame
+		toReturn = ran;
+	}else{
+		while(hasFrame(p,ran)==0){
+			ran=(ran+1)%10;
+		}
+		toReturn = ran;
+	}
+	//NEED TO CATCH THIS
+	if(findFrameOwner(toReturn)==NULL){//if victim owner is not in ready list, then VICTIM PCB IS STILL RUNNING ABORT TAKING FRAME.
+		//try a different frame.
+		toReturn = findVictim(p);
+	}
+
+	return toReturn;
 }

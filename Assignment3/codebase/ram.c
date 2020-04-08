@@ -23,6 +23,19 @@ void removeFromRam (int start, int end){
     }
 }
 
+
+void addFrameToRAM(FILE *p, int frameNumber){
+    char buffer[1000];
+    int i=0;
+    while (!feof(p) && i<4){
+        fgets(buffer,999,p);
+        ram[frameNumber]= strdup(buffer);
+        frameNumber++;
+        i++;
+    }
+    // Note that file pointer is updated in that case
+}
+
 /*
 This function will add the content of a file to the local ram array variable
 In the case of an error (due to lack of RAM), -1 will be assigned to
