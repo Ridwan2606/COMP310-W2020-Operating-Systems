@@ -4,6 +4,7 @@
 #include"shellmemory.h"
 #include"shell.h"
 #include"kernel.h"
+#include"ram.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -82,6 +83,8 @@ static int run(char * words[]){
     return 0;
 }
 
+
+// EXEC SHOULD NOW BE ABLE TO EXECUTE THE SAME FILES.
 int exec(char * words[]){
     //filter out duplicated text file names
     char * filename[3] = { "_NONE_", "_NONE_", "_NONE_"};
@@ -107,6 +110,7 @@ int exec(char * words[]){
                     displayCode(errorCode,words[i]);
                     printf("EXEC COMMAND ABORTED...\n");
                     emptyReadyQueue();
+                    clearRAM();
                     return 0;
                 }
             }

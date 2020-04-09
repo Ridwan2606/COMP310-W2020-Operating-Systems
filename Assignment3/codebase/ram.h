@@ -1,9 +1,10 @@
 #include<stdio.h>
+
 /*
 Ram structure implemented as an array.
-Size is 1000 strings
+Size is 40 strings
 */
-char* ram[1000];
+char *ram[40];
 
 /*
 This function will add the content of a file to the local ram array variable
@@ -23,6 +24,17 @@ end : pointer to variable which will store the index of last line of file in ram
 void removeFromRam (int, int);
 
 /*
-Reset the pointer to the free cell back to index 0
+This function will delete a frame corresponding to the passed frameNumber from the ram
 */
-void resetRAM();
+void removeFrameFromRAM(int);
+
+/*
+This function clears the RAM.
+*/
+void clearRAM ();
+
+/*
+Passing a filepointer to a line in a textfile, the function will read the 4 lines from that pointer
+and store these 4 lines at the framenumber specified.
+*/
+void addFrameToRAM(FILE *p, int frameNumber)

@@ -23,17 +23,20 @@ void removeFromRam (int start, int end){
     }
 }
 
+/*
+This function clears the RAM.
+*/
+void removeFromRam (){
+    removeFromRam(0,39);
+}
 
-void addFrameToRAM(FILE *p, int frameNumber){
-    char buffer[1000];
-    int i=0;
-    while (!feof(p) && i<4){
-        fgets(buffer,999,p);
-        ram[frameNumber]= strdup(buffer);
-        frameNumber++;
-        i++;
-    }
-    // Note that file pointer is updated in that case
+/*
+This function will delete a frame corresponding to the passed frameNumber from the ram
+*/
+void removeFrameFromRAM(int frameNumber){
+    int start = frameNumber*4;
+    int end = start + 4;
+    removeFromRam(start,end);
 }
 
 /*
@@ -79,4 +82,18 @@ void resetRAM(){
     nextFree = 0;
 }
 
-
+/*
+Passing a filepointer to a line in a textfile, the function will read the 4 lines from that pointer
+and store these 4 lines at the framenumber specified.
+*/
+void addFrameToRAM(FILE *p, int frameNumber){
+    char buffer[1000];
+    int i=0;
+    while (!feof(p) && i<4){
+        fgets(buffer,999,p);
+        ram[frameNumber]= strdup(buffer);
+        frameNumber++;
+        i++;
+    }
+    // Note that file pointer is updated in that case
+}

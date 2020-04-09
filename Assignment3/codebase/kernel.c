@@ -29,7 +29,7 @@ It will delete the content of the backing store directory named "BackingStore"
 */
 int boot(){
     //Clears the RAM
-    removeFromRam(0,40);
+    clearRAM();
     //Clears the backing store
     system("mkdir BackingStore");
 }
@@ -40,7 +40,7 @@ to the shellUI function.
 */
 int kernel()
 {
-    shellUI();
+    return shellUI();
 }
 
 /*
