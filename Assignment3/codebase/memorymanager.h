@@ -1,12 +1,8 @@
 /*
-Returns 1 for success, 0 for error
+Loads the page (corresponding to the pagenumber) from the file 
+into the frame (corresponding to the framenumber) in the ram
 */
-int launcher(FILE* fp1);
-
-/*
-Free the frames belonging to the passed PCB from the RAM
-*/
-int freeFramesForPCB(struct PCB* pcb);
+void loadPage(int pageNumber, FILE* fp, int frameNumber);
 
 /*
 Looks for a free frame (4 consecutive cell set to NULL) starting from the first Frame in RAM,
@@ -17,17 +13,13 @@ Else a free frame was found, return its framenumber
 int findFrame();
 
 /*
-Loads the page (corresponding to the pagenumber) from the file 
-into the frame (corresponding to the framenumber) in the ram
-*/
-void loadPage(int pageNumber, FILE* fp, int frameNumber);
-
-/*
 Returns the frame number that will be allocated to that PCB passed.
 This frame will be taken from another PCB. Note that the victim will
 be a PCB whose current/active frame is other than the frame number returned
 */
 int findVictim(struct PCB* p);
+
+
 
 /*
 Passes 4 arguments
@@ -41,3 +33,13 @@ victimFrame : If equal to -1, nothing
 Updates the pageTable of the passed PCB
 */
 int updatePageTable(struct PCB* p, int pageNumber, int frameNumber, int victimFrame);
+
+/*
+Returns 1 for success, 0 for error
+*/
+int launcher(FILE* fp1);
+
+/*
+Free the frames belonging to the passed PCB from the RAM
+*/
+int freeFramesForPCB(struct PCB* pcb);

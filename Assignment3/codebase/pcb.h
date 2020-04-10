@@ -27,11 +27,11 @@ pageTable[i] = -1 (For 0 to page_max-1)
 
 If cannot create pcb, returns NULL
 */
-PCB* makePCB(int max_pages, int pid);
+struct PCB* makePCB(int max_pages, int pid);
 
 /*
 Passes a pointer to a PCB and a framenumber.
 Returns 1 if that framenumber is in the PCB pageTable
 Return 0 if framenumber is not present in the PCB pageTable
 */
-int isAFrameOf(PCB* pcb, int frameNumber);
+int isAFrameOf(struct PCB* pcb, int frameNumber);

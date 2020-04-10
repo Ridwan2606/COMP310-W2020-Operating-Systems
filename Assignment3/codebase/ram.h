@@ -37,4 +37,4 @@ void clearRAM ();
 Passing a filepointer to a line in a textfile, the function will read the 4 lines from that pointer
 and store these 4 lines at the framenumber specified.
 */
-void addFrameToRAM(FILE *p, int frameNumber)
+void addFrameToRAM(FILE *p, int frameNumber);

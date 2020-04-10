@@ -40,33 +40,6 @@ void loadPage(int pageNumber, FILE* fp, int frameNumber){
 }
 
 /*
-void loadPage2(int pageNumber, FILE* fp, int frameNumber){
-	rewind(fp);//reset file pointer just in case
-	//move the fp to the proper page
-	int currentPage=0;
-	char line[256];
-	for(currentPage;currentPage!=pageNumber;currentPage++){//while currentpage != desired page number
-		int count=0;
-		while(fgets(line, sizeof(line), fp)!=NULL && count<3){
-			count++;
-		}
-	}
-	//we are at the correct page.
-	//load next 4 (or less) instructions into RAM
-	int cell = frameNumber*4;
-	int offset=0;;
-	char* tmp;
-	while(fgets(line, sizeof(line), fp)!=NULL && offset<=3){
-		tmp = &line[0];
-		loadInstruction(tmp, cell+offset);
-		offset++;
-	}
-	rewind(fp);
-	//page is loaded into desired frame and fp is reset to beginning
-}
-*/
-
-/*
 Looks for a free frame (4 consecutive cell set to NULL) starting from the first Frame in RAM,
 and checking the next frame and so on.
 If no such free frame exist, return -1
@@ -147,28 +120,6 @@ int findVictim(struct PCB* p){
 		}
 	}
 }
-
-/*
-int findVictim2(struct PCB* p){
-	int toReturn = 0;
-	int ran = rand()%10;
-	if(hasFrame(p,ran)==1){//if the pcb does not have the random frame
-		toReturn = ran;
-	}else{
-		while(hasFrame(p,ran)==0){
-			ran=(ran+1)%10;
-		}
-		toReturn = ran;
-	}
-	//NEED TO CATCH THIS
-	if(findFrameOwner(toReturn)==NULL){//if victim owner is not in ready list, then VICTIM PCB IS STILL RUNNING ABORT TAKING FRAME.
-		//try a different frame.
-		toReturn = findVictim(p);
-	}
-
-	return toReturn;
-}
-*/
 
 /*
 Passes 4 arguments

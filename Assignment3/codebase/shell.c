@@ -32,7 +32,7 @@ void displayCode(int errorCode, char * command){
         printf("ERRORCODE -5 : NOT ENOUGH RAM TO ADD PROGRAM.'%s'\n",command);
         break;
     case -6:
-        printf("ERRORCODE -6 : LAUNCHING ERROR \n",command);
+        printf("ERRORCODE -6 : LAUNCHING ERROR \n");
         break;
     }
 
