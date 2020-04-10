@@ -26,7 +26,7 @@ void removeFromRam (int start, int end){
 /*
 This function clears the RAM.
 */
-void removeFromRam (){
+void clearRAM (){
     removeFromRam(0,39);
 }
 
@@ -95,5 +95,8 @@ void addFrameToRAM(FILE *p, int frameNumber){
         frameNumber++;
         i++;
     }
+
+    // if end of file and frame not full, WHAT TO DO????
+    
     // Note that file pointer is updated in that case
 }

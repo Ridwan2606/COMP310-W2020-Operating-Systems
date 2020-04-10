@@ -6,8 +6,10 @@
 #include "pcb.h"
 #include "ram.h"
 #include "interpreter.h"
+#include "kernel.h"
 
-int no_process=1;
+//number of pcb/processes launched so far (EXEC)
+int no_process=0;
 
 int countTotalPages(FILE* fp){
 	int no_lines=0;
@@ -24,6 +26,10 @@ int countTotalPages(FILE* fp){
     return no_pages;
 }
 
+/*
+Loads the page (corresponding to the pagenumber) from the file 
+into the frame (corresponding to the framenumber) in the ram
+*/
 void loadPage(int pageNumber, FILE* fp, int frameNumber){
     //Moves file pointer to the required page
     fseek(fp, pageNumber*4, SEEK_SET); 
@@ -60,6 +66,12 @@ void loadPage2(int pageNumber, FILE* fp, int frameNumber){
 }
 */
 
+/*
+Looks for a free frame (4 consecutive cell set to NULL) starting from the first Frame in RAM,
+and checking the next frame and so on.
+If no such free frame exist, return -1
+Else a free frame was found, return its framenumber
+*/
 int findFrame(){
     int found = FALSE;
     int frame = -1;
@@ -81,7 +93,7 @@ int findFrame(){
 
             // If found, initialise frame
             if (found) {
-                frame = i*4;
+                frame = i;
                 break;
             }
         }
@@ -103,28 +115,37 @@ int findFrame(){
 
 /*
 Returns the frame number that will be allocated to that PCB passed.
-This frame will be taken from another PCB
+This frame will be taken from another PCB. Note that the victim will
+be a PCB whose current/active frame is other than the frame number returned
 */
 int findVictim(struct PCB* p){
-	int final_frameNum = 0;
+	//get a random framenumber
 	int frameNum = rand()%10;
-	if(isAPageOf(p,frameNum)==-1){ 
-		final_frameNum = frameNum;
+	//if the frame does not belong to the pcb
+	if(!isAFrameOf(p,frameNum)){ 
+		return frameNum;
+	// else
 	}else{
-		while(isAPageOf(p,frameNum)==0){
-			frameNum=(frameNum+1)%10;
-		}
-		final_frameNum = frameNum;
-	}
+		// loop ends when we find a frame which is not the current/active frame
+		// of its owner pcb (victim)
+		while (TRUE){
+			//while the current frame belong to the pcb, check the next one
+			while(isAFrameOf(p,frameNum)==0){
+				frameNum=(frameNum+1)%10;
+			}
 
-    /*
-	//NEED TO CATCH THIS
-	if(findFrameOwner(toReturn)==NULL){//if victim owner is not in ready list, then VICTIM PCB IS STILL RUNNING ABORT TAKING FRAME.
-		//try a different frame.
-		toReturn = findVictim(p);
+			// get the pcb (victim) to which this frame belongs
+			struct PCB* victim = getFrameOwner(frameNum);
+
+			// if this frame is not the current/active frame of the victim pcb, we return this frameNumber
+			if (victim->pageTable[victim->PC_page] != frameNum){
+				return frameNum;
+			// else loop again checking the next frame
+			} else {
+				frameNum=(frameNum+1)%10;
+			}
+		}
 	}
-    */
-	return final_frameNum;
 }
 
 /*
@@ -149,10 +170,17 @@ int findVictim2(struct PCB* p){
 }
 */
 
-// WE CAN USE HIS BUT CHANGED THE findFrameOwner NAME....
-// WE CAN USE HIS BUT CHANGED THE findFrameOwner NAME....
-// WE CAN USE HIS BUT CHANGED THE findFrameOwner NAME....
-// WE CAN USE HIS BUT CHANGED THE findFrameOwner NAME....
+/*
+Passes 4 arguments
+p : PCB whose current page is being allocated a frame to
+pageNumber : pageNumber of that page
+frameNumber : the frameNumber of the frame allocated to this page
+victimFrame : If equal to -1, nothing
+			  If not equal to -1, then it is the same as the frameNumber
+			  but denotes that this frame belongs to another PCB being the victim
+			  so we need to change the pageTable of the victim PCB
+Updates the pageTable of the passed PCB
+*/
 int updatePageTable(struct PCB* p, int pageNumber, int frameNumber, int victimFrame){
     // If we have a victim
 	if(victimFrame != -1){
@@ -181,7 +209,6 @@ int launcher(FILE* fp1){
 	sprintf(buffer,"%d",no_process);
 	strcat(newProcess,buffer);
 	strcat(newProcess,extension);
-	no_process++;
 
 	//Opening the newly created file
 	FILE* fp2 = fopen(newProcess,"w+");
@@ -206,7 +233,15 @@ int launcher(FILE* fp1){
 
 	// Getting the max pages for that program and creates a PCB for it
 	int no_page = countTotalPages(fp2);
-	struct PCB* pcb = makePCB(no_page);
+	struct PCB* pcb = makePCB(no_page,no_process);
+
+	// if cannot create PCB, close file in backing store and return 0;
+	if (pcb == NULL){
+		fclose(fp2);
+		return 0;
+	}
+
+	no_process++;
 
 	// Finding a frame for 1st page
 	int frame = findFrame();
@@ -242,8 +277,25 @@ int launcher(FILE* fp1){
 		//Update pageTable
 		updatePageTable(pcb,1,frame,victimFrame);//updates pcb's page table
 	}
+
+	//close backing store file
+	fclose(fp2);
 	//This pcb is now added into the ready queue as its first 2 pages are loaded in RAM.
 	addToReady(pcb);
-
 	return 1;
+}
+
+/*
+Free the frames belonging to the passed PCB from the RAM
+*/
+int freeFramesForPCB(struct PCB* pcb){
+	for (int i = 0; i < pcb->pages_max; i++)
+	{
+		// if the current page has a frame in the RAM, remove it
+		if (pcb->pageTable[i] != -1){
+			removeFrameFromRAM(pcb->pageTable[i]);
+			pcb->pageTable[i] = -1;
+		}
+	}
+	return 0;
 }

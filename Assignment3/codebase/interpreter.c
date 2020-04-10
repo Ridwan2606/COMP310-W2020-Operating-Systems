@@ -5,6 +5,7 @@
 #include"shell.h"
 #include"kernel.h"
 #include"ram.h"
+#include"memorymanager.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -83,40 +84,35 @@ static int run(char * words[]){
     return 0;
 }
 
-
-// EXEC SHOULD NOW BE ABLE TO EXECUTE THE SAME FILES.
 int exec(char * words[]){
-    //filter out duplicated text file names
     char * filename[3] = { "_NONE_", "_NONE_", "_NONE_"};
     int nextFree = 0;
     int errorCode = 0;
-    for (int i = 1; i <= 3; i++)
+
+    for (int i = 0; i < 3; i++)
     {
         if ( strcmp(words[i],"_NONE_") != 0 ) {
-            int duplicate = FALSE;
-            for (int j = 0; j<i-1; j++){
-                if ( strcmp(filename[j],words[i]) == 0 ) {
-                    duplicate = TRUE;
-                    break;
-                }
-            }
-            if (duplicate){
-                displayCode(-6,words[i]);
+            filename[i] = strdup(words[i]);
+
+            FILE * fp = fopen(filename[i],"r");
+            int errorCode;
+            if (fp == NULL) {
+                errorCode = -3;
             } else {
-                filename[nextFree] = strdup(words[i]);
-                nextFree++;
-                errorCode = myinit(words[i]);
-                if ( errorCode < 0){
-                    displayCode(errorCode,words[i]);
-                    printf("EXEC COMMAND ABORTED...\n");
-                    emptyReadyQueue();
-                    clearRAM();
-                    return 0;
+                int err = launcher(fp);
+                // if launcher failed, set errorCode to -6 for LAUNCHING ERROR
+                if ( err == 0){
+                    errorCode = -6;
                 }
             }
-        // We've ran through every filenames, so get out of the for loop
-        } else {
-            break;
+            if ( errorCode < 0){
+                displayCode(errorCode,words[i]);
+                printf("EXEC COMMAND ABORTED...\n");
+                emptyReadyQueue();
+                clearRAM();
+                // WHAT TO DO WITH BACKING STORE FILES?
+                return 0;
+            }
         }
     }
 

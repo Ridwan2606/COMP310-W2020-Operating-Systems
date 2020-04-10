@@ -34,3 +34,9 @@ int scheduler();
 Flushes every pcb off the ready queue in the case of a load error
 */
 void emptyReadyQueue();
+
+/*
+Given a frameNumber, it returns the PCB that was allocated
+this frame.
+*/
+PCB* getFrameOwner(int frameNumber);

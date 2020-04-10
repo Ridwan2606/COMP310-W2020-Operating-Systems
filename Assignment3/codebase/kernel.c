@@ -5,6 +5,7 @@
 #include"ram.h"
 #include"cpu.h"
 #include"interpreter.h"
+#include"memorymanager.h"
 
 /*
 This is a node in the Ready Queue implemented as 
@@ -30,17 +31,22 @@ It will delete the content of the backing store directory named "BackingStore"
 int boot(){
     //Clears the RAM
     clearRAM();
-    //Clears the backing store
+    //Clears the backing store ( DOES IT????????????????)
+    system("rm -r BackingStore");
     system("mkdir BackingStore");
 }
 
 /*
 This is the kernel function which delegates the flow of operation
 to the shellUI function.
+At the end, it also deletes the files in the BackingStore
 */
 int kernel()
 {
+    // runs the shell
     return shellUI();
+    // DELETE FILES IN BACKING STORE
+    system("rm -r BackingStore/*");
 }
 
 /*
@@ -106,7 +112,6 @@ Return an errorCode:
 ERRORCODE 0 : NO ERROR
 ERRORCODE -3 : SCRIPT NOT FOUND
 ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
-*/
 int myinit(char* filename){
     // Open the filename to get FILE *
     // call addToRam on that File *
@@ -124,6 +129,81 @@ int myinit(char* filename){
     addToReady(pcb);
     return 0;
 }
+*/
+
+
+/*
+Current at a pageFault
+The page fault operation follows these steps: 
+1. Determine the next page: PC_page++. (our scripts never loop) 
+
+2. If PC_page is beyond pages_max then the program terminates, 
+otherwise we check to see if the frame for that page exists in the pageTable array. 
+
+3. If pageTable[PC_page] is valid then we have the frame number 
+and can do PC=ram[frame] and reset PC_offset to zero. 
+
+4. If pageTable[PC_page] is NOT valid then we need 
+to find the page on disk and update the PCB page table 
+and possibly the victim’s page table. 
+Start by (a) finding the page in the backing store, then 
+(b) finding space in RAM (either find a free cell or select a victim), finally 
+(c) update the page tables, 
+(d) update RAM frame with instructions, and do 
+(e) PC=ram[frame] and 
+(f) reset PC_offset to zero. 
+
+5. Since the PCB was interrupted, it has lost it quanta, 
+even when there were some quanta left. 
+Store everything back into the PCB. 
+Place the PCB at the back of the Ready queue.
+*/
+int resolvePageFault(struct PCB* pcb){
+    // Go to next page
+    pcb->PC_page ++;
+    //If no more pages, free the frames for that pcb and its pointer
+    if (pcb->PC_page == pcb->pages_max){
+        freeFramesForPCB(pcb);
+        free(pcb);
+    } else {
+        // if the current page does not have a frame allocated to it
+        if (pcb->pageTable[pcb->PC_page] == -1){
+
+            //Finds the file in the backing store for that PCB
+            char filename[50] = "BackingStore/file";
+            char* extension = ".txt";
+            char buffer[8];
+            sprintf(buffer,"%d",pcb->PID);
+            strcat(filename,buffer);
+            strcat(filename,extension);
+            FILE* fp = fopen(filename,"r");
+            // LATER CATER FOR NULL FILE POINTER
+
+            //looks for a frame in ram
+            int frameNum = findFrame();
+            int victimframe = -1;
+            //if no free frame, choose a victim
+            if (frameNum = -1) {
+                frameNum = findVictim(pcb);
+                victimframe = frameNum;
+            }
+            //loads the current page in the frame
+            loadPage(pcb->PC_page,fp,frameNum);
+            //update the page table for current pcb ( possible for victim as well if any)
+            updatePageTable(pcb,pcb->PC_page,frameNum,victimframe);
+            fclose(fp);
+        }
+
+        // Update PC and PC_offset of that pcb
+        pcb->PC = pcb->pageTable[pcb->PC_page]*4;
+        pcb->PC_offset = 0;
+        // add it again to the ready queue
+        addToReady(pcb);
+    }
+
+    return 0;
+}
+
 
 int scheduler(){
     // set CPU quanta to default, IP to -1, IR = NULL
@@ -132,30 +212,44 @@ int scheduler(){
     while (size() != 0){
         //pop head of queue
         PCB* pcb = pop();
-        //copy PC of PCB to IP of CPU
+
+        //Initialise the IP and offset of the CPU
+        // CPU.IP = pcb -> IP???????????????????
         CPU.IP = pcb->PC;
+        CPU.offset = pcb->PC_offset;
+
+        int errorCode = run(CPU.quanta);
 
         int isOver = FALSE;
-        int remaining = (pcb->end) - (pcb->PC) + 1;
-        int quanta = DEFAULT_QUANTA;
+        int isPageFault = FALSE;
 
-        if (DEFAULT_QUANTA >= remaining) {
-            isOver = TRUE;
-            quanta = remaining;
+        // Either end of program or page fault
+        if (errorCode == 1 || errorCode == 2){
+            // if last page, it is end of program
+            if (pcb->PC_page == pcb->pages_max){
+                isOver = TRUE;
+            // else pageFault
+            } else {
+                isPageFault = TRUE;
+            }
         }
 
-        int errorCode = run(quanta);
-
+        // If an error occurred or the program is done, delete frames of that pcb and free it
         if ( errorCode!=0 || isOver ){
-            removeFromRam(pcb->start,pcb->end);
+            //free the frames occupied by this pcb
+            freeFramesForPCB(pcb);
+            //Deallocate the memory for the pcb pointer
             free(pcb);
+        // If a page fault occurred, 
+        } else if (isPageFault)  {
+            resolvePageFault(pcb);
+        // If no error occured, increment the page_offset of that pcb
         } else {
-            pcb->PC += DEFAULT_QUANTA;
+            pcb->PC_offset+=2;
             addToReady(pcb);
         }
     }
-    // reset RAM
-    resetRAM();
+    // Clear RAM?
     return 0;
 }
 
@@ -170,5 +264,17 @@ void emptyReadyQueue(){
         free(temp);
     }
     sizeOfQueue =0;
+}
+
+/*
+Given a frameNumber, it returns the PCB that was allocated
+this frame.
+*/
+PCB* getFrameOwner(int frameNumber){
+    ReadyQueueNode * temp = head;
+    while (temp!=NULL){
+        if (isAFrameOf(temp->PCB,frameNumber)) return temp->PCB;
+        temp = temp->next;
+    }
 }
 

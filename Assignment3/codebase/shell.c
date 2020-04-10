@@ -11,7 +11,7 @@ ERRORCODE -2 : INCORRECT NUMBER OF ARGUMENTS
 ERRORCODE -3 : SCRIPT NOT FOUND
 ERRORCODE -4 : UNKNOWN COMMAND.
 ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
-ERRORCODE -6 : SCRIPT <NAME> ALREADY LOADED (EXEC)
+ERRORCODE -6 : LAUNCHING ERROR (EXEC)
 */
 void displayCode(int errorCode, char * command){
     switch (errorCode)
@@ -32,7 +32,7 @@ void displayCode(int errorCode, char * command){
         printf("ERRORCODE -5 : NOT ENOUGH RAM TO ADD PROGRAM.'%s'\n",command);
         break;
     case -6:
-        printf("ERRORCODE -6 : %s ALREADY LOADED \n",command);
+        printf("ERRORCODE -6 : LAUNCHING ERROR \n",command);
         break;
     }
 
