@@ -38,6 +38,8 @@ int run(int quanta){
             return 1;
         }
 
+        printf("CPU executing: %s",ram[eff_address]);
+
         strcpy(CPU.IR,ram[eff_address]);
         int errorCode = parse(CPU.IR);
         // Do error checking and if error, return error

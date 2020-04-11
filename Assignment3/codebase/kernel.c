@@ -220,6 +220,8 @@ int scheduler(){
         CPU.IP = pcb->PC;
         CPU.offset = pcb->PC_offset;
 
+        printf("Process %d is at page=%d,PC=%d,offset=%d\n", pcb->PID, pcb->PC_page,pcb->PC, pcb->PC_offset );
+
         int errorCode = run(CPU.quanta);
 
         int isOver = FALSE;

@@ -89,14 +89,31 @@ and store these 4 lines at the framenumber specified.
 void addFrameToRAM(FILE *p, int frameNumber){
     char buffer[1000];
     int i=0;
-    while (!feof(p) && i<4){
-        fgets(buffer,999,p);
-        ram[frameNumber]= strdup(buffer);
-        frameNumber++;
+    int pos = frameNumber*4;
+    while (fgets(buffer,999,p)!=NULL && i<4){
+        ram[pos]= strdup(buffer);
+        pos++;
         i++;
     }
 
     // if end of file and frame not full, WHAT TO DO????
     
     // Note that file pointer is updated in that case
+}
+
+void displayRAM(){
+
+    printf("RAM CONTENT:\n\n");
+    for (int i = 0; i < 40; i++)
+    {
+        if (i%4==0){
+            printf("--Frame %d--\n",i/4);
+        }
+        if (ram[i]==NULL){
+            printf("%d: NULL\n", i);
+        } else {
+            printf("%d: %s",i,ram[i]);
+        }
+    }
+    printf("----------\n");
 }

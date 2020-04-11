@@ -31,8 +31,16 @@ Loads the page (corresponding to the pagenumber) from the file
 into the frame (corresponding to the framenumber) in the ram
 */
 void loadPage(int pageNumber, FILE* fp, int frameNumber){
+
+	//resets file pointer
+	rewind(fp);
     //Moves file pointer to the required page
-    fseek(fp, pageNumber*4, SEEK_SET); 
+	char buffer[1000];
+	int i = 0;
+	while (i<pageNumber*4){
+		fgets(buffer,999,fp);
+		i++;
+	}
     // Adds that page to the required frame in RAM
     addFrameToRAM(fp,frameNumber);
     //Reset file pointer to the beginning of the while

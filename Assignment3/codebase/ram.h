@@ -38,3 +38,5 @@ Passing a filepointer to a line in a textfile, the function will read the 4 line
 and store these 4 lines at the framenumber specified.
 */
 void addFrameToRAM(FILE *p, int frameNumber);
+
+void displayRAM();
