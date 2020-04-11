@@ -5,10 +5,10 @@
 struct MEM {
     char* var;
     char* value;
-} environmentVars[25];
+} environmentVars[100];
 
-//restricts number of environment variables to 25
-int memorySize = 25;
+//restricts number of environment variables to 100
+int memorySize = 100;
 
 // This global variable stores the index of the last stored variable. Set to 0 at first. Its limit is the memory size
 int lastVarIndex= 0;

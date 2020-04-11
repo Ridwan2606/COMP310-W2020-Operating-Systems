@@ -34,7 +34,7 @@ PCB* makePCB(int max_pages, int pid){
     if (pcb == NULL) return NULL;
     pcb->PID = pid;
     pcb->pages_max = max_pages;
-    for (int i = max_pages; i < max_pages; i++)
+    for (int i = 0; i < max_pages; i++)
     {
         pcb->pageTable[i]=-1;
     }
@@ -42,23 +42,6 @@ PCB* makePCB(int max_pages, int pid){
     pcb->PC_offset=0;
     return pcb;
 }
-
-/*
-Passes 2 parameters (start , end)
-This method creates a PCB with fields set as this:
-PC = start
-start = start
-end = end
-PCB* makePCB(int start, int end){
-    PCB* pcb = (PCB*)malloc(sizeof(PCB));
-    pcb->PC = start;
-    pcb->start = start;
-    pcb->end = end;
-    return pcb;
-}
-*/
-
-
 
 /*
 Passes a pointer to a PCB and a framenumber.

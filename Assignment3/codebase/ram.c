@@ -95,12 +95,17 @@ void addFrameToRAM(FILE *p, int frameNumber){
         pos++;
         i++;
     }
-
-    // if end of file and frame not full, WHAT TO DO????
-    
-    // Note that file pointer is updated in that case
+    //If file ends prematurely, set the remaining cells to NULL;
+    for (int j = i; i < 4; i++)
+    {
+        ram[pos] = NULL;
+    }
 }
 
+/*
+Helper function for debugging purposes. 
+Display the whole ram in Frames
+*/
 void displayRAM(){
 
     printf("RAM CONTENT:\n\n");

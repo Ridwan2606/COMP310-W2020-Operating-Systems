@@ -56,10 +56,8 @@ Else a free frame was found, return its framenumber
 int findFrame(){
     int found = FALSE;
     int frame = -1;
-
     //For each consecutive frame
     for (int i=0; i< 10; i++){
-
         // If 1st cell in that frame is null, examine the 3 other cells
         if (ram[i*4]==NULL){
             int found = TRUE;
@@ -74,24 +72,12 @@ int findFrame(){
 
             // If found, initialise frame
             if (found) {
-                frame = i;
+				frame = i;
                 break;
             }
         }
     }
-
     return frame;
-
-    /*
-	int frame = -1;
-	for(int i=0;i<10;i++){
-		if(getInstruction(i*4)=='\0'){
-			frame=i;
-			break;
-		}
-	}
-	return frame;
-    */
 }
 
 /*
@@ -102,29 +88,21 @@ be a PCB whose current/active frame is other than the frame number returned
 int findVictim(struct PCB* p){
 	//get a random framenumber
 	int frameNum = rand()%10;
-	//if the frame does not belong to the pcb
-	if(!isAFrameOf(p,frameNum)){ 
-		return frameNum;
-	// else
-	}else{
-		// loop ends when we find a frame which is not the current/active frame
-		// of its owner pcb (victim)
-		while (TRUE){
-			//while the current frame belong to the pcb, check the next one
-			while(isAFrameOf(p,frameNum)==0){
-				frameNum=(frameNum+1)%10;
-			}
-
-			// get the pcb (victim) to which this frame belongs
-			struct PCB* victim = getFrameOwner(frameNum);
-
-			// if this frame is not the current/active frame of the victim pcb, we return this frameNumber
-			if (victim->pageTable[victim->PC_page] != frameNum){
-				return frameNum;
-			// else loop again checking the next frame
-			} else {
-				frameNum=(frameNum+1)%10;
-			}
+	// loop ends when we find a frame which is not the current/active frame
+	// of its owner pcb (victim)
+	while (TRUE){
+		//while the current frame belong to the pcb, check the next one
+		while(isAFrameOf(p,frameNum)){
+			frameNum=(frameNum+1)%10;
+		}
+		// get the pcb (victim) to which this frame belongs
+		struct PCB* victim = getFrameOwner(frameNum);
+		// if this frame is not the current/active frame of the victim pcb, we return this frameNumber
+		if (victim->pageTable[victim->PC_page] != frameNum){
+			return frameNum;
+		// else loop again checking the next frame
+		} else {
+			frameNum=(frameNum+1)%10;
 		}
 	}
 }

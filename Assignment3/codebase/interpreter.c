@@ -89,16 +89,13 @@ int exec(char * words[]){
     int errorCode = 0;
     for (int i = 0; i < 3; i++)
     {
-        if ( strcmp(words[i],"_NONE_") != 0 ) {
+        if ( strcmp(words[i+1],"_NONE_") != 0 ) {
             filename[i] = strdup(words[i+1]);
             FILE * fp = fopen(filename[i],"r");
             if (fp == NULL) {
-                printf("Can't open %s\n", filename[i]);
                 errorCode = -3;
             } else {
-                printf("Starting launcher for %s\n", filename[i]);
                 int err = launcher(fp);
-                displayRAM();
                 // if launcher failed, set errorCode to -6 for LAUNCHING ERROR
                 if ( err == 0){
                     errorCode = -6;
@@ -109,13 +106,10 @@ int exec(char * words[]){
                 printf("EXEC COMMAND ABORTED...\n");
                 emptyReadyQueue();
                 clearRAM();
-                // WHAT TO DO WITH BACKING STORE FILES?
                 return 0;
             }
         }
     }
-
-    displayRAM();
 
     printf("|----------| ");
     printf("\tSTARTING CONCURRENT PROGRAMS ( ");

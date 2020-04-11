@@ -7,6 +7,10 @@
 #include"cpu.h"
 #include"memorymanager.h"
 #include"interpreter.h"
+#include <dirent.h>
+#include <errno.h>
+
+
 
 
 /*
@@ -32,10 +36,17 @@ It will delete the content of the backing store directory named "BackingStore"
 */
 int boot(){
     //Clears the RAM
-    clearRAM();
-    //Clears the backing store ( DOES IT????????????????)
-    system("rm -r BackingStore");
-    system("mkdir BackingStore");
+    clearRAM(); 
+    // Get a directory pointer
+    DIR* dir = opendir("BackingStore");
+    // if directory exists, close it and remove its content
+    if (dir) {
+        closedir(dir);
+        system("rm -r BackingStore/*");
+    //if directory does not exist, create it
+    } else if (ENOENT == errno) {
+        system("mkdir BackingStore");
+    }
 }
 
 /*
@@ -46,9 +57,10 @@ At the end, it also deletes the files in the BackingStore
 int kernel()
 {
     // runs the shell
-    return shellUI();
+    int errorCode = shellUI();
     // DELETE FILES IN BACKING STORE
     system("rm -r BackingStore/*");
+    return errorCode;
 }
 
 /*
@@ -105,34 +117,6 @@ struct PCB* pop(){
     return topNode;
 }
 
-/*
-Passes a filename
-Opens the file, copies the content in the RAM.
-Creates a PCB for that program.
-Adds the PCB on the ready queue.
-Return an errorCode:
-ERRORCODE 0 : NO ERROR
-ERRORCODE -3 : SCRIPT NOT FOUND
-ERRORCODE -5 : NOT ENOUGH RAM (EXEC)
-int myinit(char* filename){
-    // Open the filename to get FILE *
-    // call addToRam on that File *
-    // If error (check via start/end variable), return that error
-    // Else create pcb using MakePCB
-    // Then add it to the ReadyQueue
-    FILE * fp = fopen(filename,"r");
-    if (fp == NULL) return -3;
-    int start;
-    int end;
-    addToRAM(fp,&start,&end);
-    fclose(fp);
-    if (start == -1) return -5;
-    PCB* pcb = makePCB(start,end);
-    addToReady(pcb);
-    return 0;
-}
-*/
-
 
 /*
 Current at a pageFault
@@ -183,9 +167,10 @@ int resolvePageFault(struct PCB* pcb){
 
             //looks for a frame in ram
             int frameNum = findFrame();
+            
             int victimframe = -1;
             //if no free frame, choose a victim
-            if (frameNum = -1) {
+            if (frameNum == -1) {
                 frameNum = findVictim(pcb);
                 victimframe = frameNum;
             }
@@ -195,14 +180,12 @@ int resolvePageFault(struct PCB* pcb){
             updatePageTable(pcb,pcb->PC_page,frameNum,victimframe);
             fclose(fp);
         }
-
         // Update PC and PC_offset of that pcb
         pcb->PC = pcb->pageTable[pcb->PC_page]*4;
         pcb->PC_offset = 0;
         // add it again to the ready queue
         addToReady(pcb);
     }
-
     return 0;
 }
 
@@ -219,9 +202,6 @@ int scheduler(){
         // CPU.IP = pcb -> IP???????????????????
         CPU.IP = pcb->PC;
         CPU.offset = pcb->PC_offset;
-
-        printf("Process %d is at page=%d,PC=%d,offset=%d\n", pcb->PID, pcb->PC_page,pcb->PC, pcb->PC_offset );
-
         int errorCode = run(CPU.quanta);
 
         int isOver = FALSE;
@@ -230,7 +210,7 @@ int scheduler(){
         // Either end of program or page fault
         if (errorCode == 1 || errorCode == 2){
             // if last page, it is end of program
-            if (pcb->PC_page == pcb->pages_max){
+            if (pcb->PC_page == pcb->pages_max-1){
                 isOver = TRUE;
             // else pageFault
             } else {
@@ -239,7 +219,7 @@ int scheduler(){
         }
 
         // If an error occurred or the program is done, delete frames of that pcb and free it
-        if ( errorCode!=0 || isOver ){
+        if ( errorCode<0 || isOver ){
             //free the frames occupied by this pcb
             freeFramesForPCB(pcb);
             //Deallocate the memory for the pcb pointer
